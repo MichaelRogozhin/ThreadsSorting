@@ -26,11 +26,27 @@
     {% endfor %}
 
     <script>
+        const POLL_INTERVAL = 500;
+        let timerId = null;
+
+        function startPolling() {
+            if (timerId !== null) return;          // уже идёт — не дублируем
+            timerId = setInterval(refreshStatus, POLL_INTERVAL);
+            refreshStatus();                        // первый тик сразу
+        }
+
+        function stopPolling() {
+            if (timerId !== null) {
+                clearInterval(timerId);
+                timerId = null;
+            }
+        }
+
         async function refreshStatus() {
             try {
                 const resp = await fetch('/api/status/');
                 const data = await resp.json();
-                for (const [name, state] of Object.entries(data)) {
+                for (const [name, state] of Object.entries(data.tasks)) {
                     const statusEl = document.getElementById('status-' + name);
                     const progressEl = document.getElementById('progress-' + name);
                     const resultEl = document.getElementById('result-' + name);
@@ -46,11 +62,29 @@
                         }
                     }
                 }
+
+                // Обновили UI — теперь решаем, продолжать ли
+                if (data.refresh === 'off') {
+                    stopPolling();
+                }
             } catch (e) {
                 console.error('Ошибка обновления статуса:', e);
+                // на сетевую ошибку логично притормозить, чтобы не спамить
+                stopPolling();
             }
         }
-        setInterval(refreshStatus, 500);
+
+        // Автозапуск при загрузке страницы
+        startPolling();
+
+        // Пауза когда вкладка скрыта — экономит запросы
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopPolling();
+            } else {
+                startPolling();
+            }
+        });
     </script>
 </body>
 </html>

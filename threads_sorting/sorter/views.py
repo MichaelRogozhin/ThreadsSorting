@@ -70,5 +70,8 @@ def status_api(request):
     """Возвращает текущие состояния всех потоков в формате JSON."""
     with state_lock:
         # Делаем копию, чтобы не отдавать ссылку на изменяемый объект
-        data = {k: v.copy() for k, v in thread_states.items()}
+        tasks = {k: v.copy() for k, v in thread_states.items()}
+        refresh = not all(v["status"] == "completed" for v in tasks.values())
+        refresh = "on" if refresh else "off"
+        data = {"refresh": refresh, "tasks": tasks}
     return JsonResponse(data)
