@@ -3,7 +3,7 @@ import time
 import random
 from django.shortcuts import render
 from django.http import JsonResponse
-from .algorithms import bubble_sort, insertion_sort, quick_sort
+from .sorters import TBubbleSorter, TInsertionSorter, TQuickSorter
 
 # Глобальное хранилище состояний (в реальном проекте используйте кэш или БД)
 thread_states = {
@@ -14,7 +14,7 @@ thread_states = {
 }
 state_lock = threading.Lock()
 
-def _run_sort(algo_name, arr, sort_func):
+def _run_sort(algo_name, arr, sorter_class):
     """Обертка для запуска сортировки в отдельном потоке."""
     with state_lock:
         thread_states[algo_name]['status'] = 'running'
@@ -22,7 +22,8 @@ def _run_sort(algo_name, arr, sort_func):
         thread_states[algo_name]['result'] = None
 
     try:
-        sort_func(arr, thread_states[algo_name])
+        sorter = sorter_class(arr, thread_states[algo_name])
+        sorter.run()
     except Exception as e:
         with state_lock:
             thread_states[algo_name]['status'] = 'error'
@@ -51,9 +52,9 @@ def index(request):
     original = [random.randint(1, 100) for _ in range(30)]
 
     threads = [
-        threading.Thread(target=_run_sort, args=('bubble', original.copy(), bubble_sort)),
-        threading.Thread(target=_run_sort, args=('insertion', original.copy(), insertion_sort)),
-        threading.Thread(target=_run_sort, args=('quick', original.copy(), quick_sort)),
+        threading.Thread(target=_run_sort, args=('bubble', original.copy(), TBubbleSorter)),
+        threading.Thread(target=_run_sort, args=('insertion', original.copy(), TInsertionSorter)),
+        threading.Thread(target=_run_sort, args=('quick', original.copy(), TQuickSorter)),
         threading.Thread(target=_monitor_worker),
     ]
     for t in threads:
