@@ -9,6 +9,7 @@
         .card h3 { margin-top: 0; }
         progress { width: 100%; height: 20px; accent-color: #4C9F50; }
         .status { font-weight: bold; }
+        .common { font-family: monospace; font-size: 0.9em; word-break: break-all; }
         .result { font-family: monospace; font-size: 0.9em; word-break: break-all; }
     </style>
 </head>
@@ -21,6 +22,8 @@
             <h3>{{ algo|capfirst }}</h3>
             <p>Статус: <span class="status" id="status-{{ algo }}">idle</span></p>
             <progress id="progress-{{ algo }}" value="0" max="100"></progress>
+            <p class="common" id="iter_count-{{ algo }}">—</p>
+            <p class="common" id="spent_time-{{ algo }}">—</p>
             <p class="result" id="result-{{ algo }}">—</p>
         </div>
     {% endfor %}
@@ -50,8 +53,12 @@
                     const statusEl = document.getElementById('status-' + name);
                     const progressEl = document.getElementById('progress-' + name);
                     const resultEl = document.getElementById('result-' + name);
+                    const iter_countEl = document.getElementById('iter_count-' + name);
+                    const spent_timeEl = document.getElementById('spent_time-' + name);
                     if (statusEl) statusEl.textContent = state.status;
                     if (progressEl) progressEl.value = state.progress || 0;
+                    if (iter_countEl) iter_countEl.textContent = `Iterations count: ${state.iter_count}`;
+                    if (spent_timeEl) spent_timeEl.textContent = `Spent time: ${state.spent_time} sec.`;
                     if (resultEl) {
                         if (state.result) {
                             resultEl.textContent = Array.isArray(state.result)

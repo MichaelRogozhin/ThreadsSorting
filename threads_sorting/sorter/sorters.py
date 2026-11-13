@@ -7,6 +7,16 @@ class TBaseSorter(object):
         self.state = state
 
     def run(self):
+        self.state["status"] = "running"
+        t1 = time.perf_counter()
+        self._run()
+        t2 = time.perf_counter()
+        td = t2 - t1
+        self.state["status"] = 'completed'
+        self.state['result'] = self.target
+        self.state['spent_time'] = round(td, 3)
+
+    def _run(self):
         ...
 
     def get_sample(self):
@@ -19,8 +29,7 @@ class TBaseSorter(object):
 
 
 class TBubbleSorter(TBaseSorter):
-    def run(self):
-        self.state["status"] = "running"
+    def _run(self):
         arr = self.target
         n = len(arr)
         for i in range(n):
@@ -29,34 +38,30 @@ class TBubbleSorter(TBaseSorter):
                 if arr[j] > arr[j + 1]:
                     arr[j], arr[j + 1] = arr[j + 1], arr[j]
                     swapped = True
+                self.state["iter_count"] += 1
                 self.state["progress"] = (i * n + j) / (n * n) * 100
                 time.sleep(0.01)
             if not swapped:
                 break
-        self.state["status"] = 'completed'
-        self.state['result'] = arr
 
 
 class TInsertionSorter(TBaseSorter):
-    def run(self):
-        self.state["status"] = "running"
+    def _run(self):
         arr = self.target
-
         for i in range(1, len(arr)):
             key = arr[i]
             j = i - 1
             while j >= 0 and key < arr[j]:
                 arr[j + 1] = arr[j]
                 j -= 1
+                self.state["iter_count"] += 1
                 self.state["progress"] = (i * len(arr) + j) / (len(arr) ** 2) * 100
                 time.sleep(0.01)
             arr[j + 1] = key
-        self.state["status"] = 'completed'
-        self.state['result'] = arr
 
 
 class TQuickSorter(TBaseSorter):
-    def run(self):
+    def _run(self):
         def quick_sort(arr, low=0, high=None):
             if high is None:
                 high = len(arr) - 1
@@ -75,12 +80,10 @@ class TQuickSorter(TBaseSorter):
                 if arr[j] <= pivot:
                     i += 1
                     arr[i], arr[j] = arr[j], arr[i]
+                self.state["iter_count"] += 1
                 self.state["progress"] = (j - low + 1) / (high - low + 1) * 100
                 time.sleep(0.01)
             arr[i + 1], arr[high] = arr[high], arr[i + 1]
             return i + 1
 
-        self.state["status"] = "running"
         quick_sort(self.target)
-        self.state["status"] = 'completed'
-        self.state['result'] = self.target

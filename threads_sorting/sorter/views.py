@@ -7,10 +7,10 @@ from .sorters import TBubbleSorter, TInsertionSorter, TQuickSorter
 
 # Глобальное хранилище состояний (в реальном проекте используйте кэш или БД)
 thread_states = {
-    'bubble':    {'status': 'idle', 'progress': 0, 'result': None},
-    'insertion': {'status': 'idle', 'progress': 0, 'result': None},
-    'quick':     {'status': 'idle', 'progress': 0, 'result': None},
-    'monitor':   {'status': 'idle', 'progress': 0, 'result': None},
+    'bubble':    {'status': 'idle', 'iter_count': 0, 'progress': 0, 'result': None, 'spent_time': 0},
+    'insertion': {'status': 'idle', 'iter_count': 0, 'progress': 0, 'result': None, 'spent_time': 0},
+    'quick':     {'status': 'idle', 'iter_count': 0, 'progress': 0, 'result': None, 'spent_time': 0},
+    'monitor':   {'status': 'idle', 'iter_count': 0, 'progress': 0, 'result': None, 'spent_time': 0},
 }
 state_lock = threading.Lock()
 
@@ -20,7 +20,8 @@ def _run_sort(algo_name, arr, sorter_class):
         thread_states[algo_name]['status'] = 'running'
         thread_states[algo_name]['progress'] = 0
         thread_states[algo_name]['result'] = None
-
+        thread_states[algo_name]['iter_count'] = 0
+        thread_states[algo_name]['spent_time'] = 0
     try:
         sorter = sorter_class(arr, thread_states[algo_name])
         sorter.run()
@@ -46,7 +47,7 @@ def index(request):
     """Главная страница: сброс состояний и запуск четырёх потоков."""
     with state_lock:
         for key in thread_states:
-            thread_states[key] = {'status': 'idle', 'progress': 0, 'result': None}
+            thread_states[key] = {'status': 'idle', 'iter_count': 0, 'progress': 0, 'result': None, 'spent_time': 0}
 
     # Генерируем случайный список для сортировки
     original = [random.randint(1, 100) for _ in range(30)]
