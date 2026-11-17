@@ -43,6 +43,11 @@ def _monitor_worker():
         thread_states['monitor']['status'] = 'completed'
         thread_states['monitor']['result'] = 'Мониторинг завершён'
 
+def about(request):
+    """Страница «О проекте»."""
+    return render(request, 'sorter/about.html')
+
+
 def index(request):
     """Главная страница: сброс состояний и запуск четырёх потоков."""
     with state_lock:

@@ -1,20 +1,9 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Сортировка в потоках</title>
-    <style>
-        body { font-family: sans-serif; max-width: 900px; margin: 20px auto; }
-        .card { border: 1px solid #ccc; border-radius: 8px; padding: 12px; margin: 10px 0; }
-        .card h3 { margin-top: 0; }
-        progress { width: 100%; height: 20px; accent-color: #4C9F50; }
-        .status { font-weight: bold; }
-        .common { font-family: monospace; font-size: 0.9em; word-break: break-all; }
-        .result { font-family: monospace; font-size: 0.9em; word-break: break-all; }
-    </style>
-</head>
-<body>
-    <h1>Сортировка в четырёх потоках</h1>
+{% extends "sorter/base.html" %}
+
+{% block title %}Сортировка в потоках{% endblock %}
+
+{% block content %}
+<h1>Сортировка в четырёх потоках</h1>
     <p><strong>Исходный список:</strong> {{ original }}</p>
 
     {% for algo in algorithms %}
@@ -93,5 +82,4 @@
             }
         });
     </script>
-</body>
-</html>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "sorter/base.html" %}
+
+{% block title %}О проекте — ThreadsSorting{% endblock %}
+
+{% block content %}
+<h1>О проекте ThreadsSorting</h1>
+
+<div class="card">
+    <h3>Что это?</h3>
+    <p>
+        Django-приложение, демонстрирующее многопоточную сортировку с визуализацией прогресса в реальном времени.
+        При открытии дашборда запускаются 4 потока, каждый из которых сортирует один и тот же случайный список
+        своим алгоритмом.
+    </p>
+</div>
+
+<div class="card">
+    <h3>Алгоритмы</h3>
+    <ul>
+        <li><strong>Bubble Sort</strong> — сортировка пузырьком (O(n²))</li>
+        <li><strong>Insertion Sort</strong> — сортировка вставками (O(n²))</li>
+        <li><strong>Quick Sort</strong> — быстрая сортировка (O(n log n) в среднем)</li>
+        <li><strong>Monitor</strong> — имитация фонового мониторинга</li>
+    </ul>
+</div>
+
+<div class="card">
+    <h3>Как это работает?</h3>
+    <ul>
+        <li>Бэкенд запускает каждый алгоритм в отдельном daemon-потоке</li>
+        <li>Состояние каждого потока хранится в глобальном словаре с защитой через threading.Lock</li>
+        <li>Фронтенд опрашивает API каждые 500мс и обновляет прогресс-бары в реальном времени</li>
+    </ul>
+</div>
+
+<div class="card">
+    <h3>Технологии</h3>
+    <ul>
+        <li>Python 3.x</li>
+        <li>Django 5.2.18</li>
+        <li>Threading — модуль потоков Python</li>
+        <li>JavaScript Fetch API — для AJAX-запросов</li>
+    </ul>
+</div>
+{% endblock %}
